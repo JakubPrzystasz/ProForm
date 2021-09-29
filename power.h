@@ -36,6 +36,37 @@ const unsigned char power_meter_location[1] = {0x0D & 0xff};
 
 const char battery_level[1] = {100};
 
+
+bool deviceConnected = false, oldDeviceConnected = false;
+
+unsigned char bleBuffer[8];
+unsigned char slBuffer[1];
+unsigned char fBuffer[4];
+
+short power = 0;
+unsigned short revolutions = 0;
+unsigned short timestamp = 0;
+unsigned short flags = 0x20;
+
+BLEServer *pServer = NULL;
+BLEService *service_dev_info = NULL, *service_battery = NULL, *service_power = NULL;
+
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_SYSTEM_ID = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_MODEL_NUMBER_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_SERIAL_NUMBER_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_FIRMWARE_REVISION_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_HARDWARE_REVISION_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_SOFTWARE_REVISION_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_MANUFACTURER_NAME_STRING = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_IEEE11073 = NULL;
+BLECharacteristic *c_SERVICE_DEVICE_INFROMATION_PNP_ID = NULL;
+
+BLECharacteristic *c_SERVICE_BATTERY_LEVEL = NULL;
+
+BLECharacteristic *c_SERVICE_CYCLING_POWER_FEATURE = NULL;
+BLECharacteristic *c_SERVICE_CYCLING_POWER_MEASUREMENT = NULL;
+BLECharacteristic *c_SERVICE_CYCLING_POWER_SENSOR_LOCATION = NULL;
+
 //Hardware
 
 //BTS MOTOR DRIVER:
@@ -43,7 +74,9 @@ const char battery_level[1] = {100};
 #define BTS_L_PWM_PIN 14
 #define BTS_R_PWM_PIN 27
 
-#define BTS_MAX_VALUE
+#define BTS_MAX_VALUE 95
+#define BTS_MIN_VALUE 5
+#define BTS_DEFAULT 5
 
 //Potentiometer
 #define POT_PIN 3
