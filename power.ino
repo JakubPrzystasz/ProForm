@@ -280,7 +280,7 @@ void loop()
       sprintf(str, "%lu BT: Notifying values\n", millis());
       Serial.print(str);
 #endif
-      timestamp += (unsigned short)(10 * (1024 / 16));
+      timestamp += (unsigned short)(reed_time);
       revolutions += 1;
 
       //pack data, and send them into device
