@@ -43,7 +43,7 @@ unsigned char bleBuffer[8];
 unsigned char slBuffer[1];
 unsigned char fBuffer[4];
 
-short power = 0;
+short power = 150;
 unsigned short revolutions = 0;
 unsigned short timestamp = 0;
 unsigned short flags = 0x20;
@@ -70,24 +70,31 @@ BLECharacteristic *c_SERVICE_CYCLING_POWER_SENSOR_LOCATION = NULL;
 //Hardware
 
 //BTS MOTOR DRIVER:
-#define BTS_EN_PIN 12
-#define BTS_L_PWM_PIN 14
-#define BTS_R_PWM_PIN 27
+#define BTS_EN_R_PIN 23
+#define BTS_EN_L_PIN 23
+
+#define BTS_L_PWM_PIN 18
+#define BTS_R_PWM_PIN 19
+#define BTS_DELAY 3
+#define BTS_PWM 128
 
 #define BTS_MAX_VALUE 95
 #define BTS_MIN_VALUE 5
-#define BTS_DEFAULT 5
+#define BTS_DEFAULT 50
 
 //Potentiometer
-#define POT_PIN 3
+#define POT_PIN 39
 
 //Switches:
-#define REED_SWITCH_PIN 34
+#define REED_SWITCH_PIN 36
 
-#define R_PLUS_PIN 4
-#define R_MINUS_PIN 15
+#define R_PLUS_PIN 15
+#define R_MINUS_PIN 2
 
 #define L_PLUS_PIN 0
-#define L_MINUS_PIN 2
+#define L_MINUS_PIN 4
+
+#define Aconst 1.0f
+#define Bconst 0.0f
 
 #define READ_POT map(analogRead(POT_PIN),0,4095,0,100)
