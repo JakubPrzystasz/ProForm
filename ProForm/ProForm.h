@@ -1,4 +1,3 @@
-
 //Debug flag:
 #define DEBUG
 
@@ -28,14 +27,13 @@
 
 //Device properties
 const char *string = "ProForm";
-const unsigned long long sys_id = 0x4E2F4100;
-const unsigned long long iee = 0x4E2F4100;
-const unsigned long long pnp = 0x4E2F41;
+const uint64_t sys_id = 0x4E2F4100;
+const uint64_t iee = 0x4E2F4100;
+const uint64_t pnp = 0x4E2F41;
 
-const unsigned char power_meter_location[1] = {0x0D & 0xff};
+const unsigned char power_meter_location = 0;
 
-const char battery_level[1] = {100};
-
+const char battery_level = 100;
 
 bool deviceConnected = false, oldDeviceConnected = false;
 
@@ -43,10 +41,8 @@ unsigned char bleBuffer[8];
 unsigned char slBuffer[1];
 unsigned char fBuffer[4];
 
-short power = 150;
-unsigned short revolutions = 0;
-unsigned short timestamp = 0;
-unsigned short flags = 0x20;
+int16_t power = 0;
+uint16_t revolutions = 0, timestamp = 0, flags = 0x20;
 
 BLEServer *pServer = NULL;
 BLEService *service_dev_info = NULL, *service_battery = NULL, *service_power = NULL;
@@ -67,26 +63,17 @@ BLECharacteristic *c_SERVICE_CYCLING_POWER_FEATURE = NULL;
 BLECharacteristic *c_SERVICE_CYCLING_POWER_MEASUREMENT = NULL;
 BLECharacteristic *c_SERVICE_CYCLING_POWER_SENSOR_LOCATION = NULL;
 
-//Hardware
+#define SERIAL_BAUD_RATE 115200u
 
-//BTS MOTOR DRIVER:
-#define BTS_EN_R_PIN 23
-#define BTS_EN_L_PIN 23
-
-#define BTS_L_PWM_PIN 18
-#define BTS_R_PWM_PIN 19
-#define BTS_DELAY 3
-#define BTS_PWM 128
-
-#define BTS_MAX_VALUE 95
-#define BTS_MIN_VALUE 5
-#define BTS_DEFAULT 50
-
-//Potentiometer
-#define POT_PIN 39
+//Servo driver:
+#define MOTOR_PIN 27
+#define MOTOR_MAX_POSITION 95u
+#define MOTOR_MIN_POSITION 5u
+#define MOTOR_DEFAULT_POSITION MOTOR_MIN_POSITION
 
 //Switches:
-#define REED_SWITCH_PIN 36
+#define REED_SWITCH_PIN 34
+#define REED_DEBOUNCE_TIME 20
 
 #define R_PLUS_PIN 15
 #define R_MINUS_PIN 2
@@ -94,7 +81,9 @@ BLECharacteristic *c_SERVICE_CYCLING_POWER_SENSOR_LOCATION = NULL;
 #define L_PLUS_PIN 0
 #define L_MINUS_PIN 4
 
+#define SWITCH_DEBOUNCE_TIME 200
+
 #define Aconst 1.0f
 #define Bconst 0.0f
 
-#define READ_POT map(analogRead(POT_PIN),0,4095,0,100)
+#define READ_POS map(analogRead(POT_PIN),0,4095,0,100)
