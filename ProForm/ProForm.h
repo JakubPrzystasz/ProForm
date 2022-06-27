@@ -1,5 +1,5 @@
 //Debug flag:
-#define DEBUG
+//#define DEBUG
 
 //Services
 #define SERVICE_DEVICE_INFORMATION "180A"
@@ -66,24 +66,26 @@ BLECharacteristic *c_SERVICE_CYCLING_POWER_SENSOR_LOCATION = NULL;
 #define SERIAL_BAUD_RATE 115200u
 
 //Servo driver:
-#define MOTOR_PIN 27
-#define MOTOR_MAX_POSITION 95u
-#define MOTOR_MIN_POSITION 5u
+#define MOTOR_PIN 18
+#define MOTOR_MAX_POSITION 85
+#define MOTOR_MIN_POSITION 0
 #define MOTOR_DEFAULT_POSITION MOTOR_MIN_POSITION
+#define MOTOR_INIT_DELAY 500u
+#define MOTOR_POS(x) (100 - x)
 
 //Switches:
 #define REED_SWITCH_PIN 34
-#define REED_DEBOUNCE_TIME 20
+#define REED_DEBOUNCE_TIME 150
 
-#define R_PLUS_PIN 15
-#define R_MINUS_PIN 2
+#define R_PLUS_PIN 4
+#define R_MINUS_PIN 16
 
-#define L_PLUS_PIN 0
-#define L_MINUS_PIN 4
+#define L_PLUS_PIN 17
+#define L_MINUS_PIN 5
 
 #define SWITCH_DEBOUNCE_TIME 200
 
-#define Aconst 1.0f
-#define Bconst 0.0f
+#define Aconst 0.0375f
+#define Bconst 5.0f
 
 #define READ_POS map(analogRead(POT_PIN),0,4095,0,100)

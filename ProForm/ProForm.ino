@@ -12,8 +12,9 @@ char str[128] = "";
 
 int8_t set_position = 0, current_position = 0;
 volatile bool reed_flag = 0, switch_flag = 0;
-uint8_t motor_position = MOTOR_DEFAULT_POSITION;
-uint32_t reed_debounce = 0, switch_debounce = 0;
+int8_t motor_position = MOTOR_DEFAULT_POSITION;
+uint32_t switch_debounce = 0;
+uint16_t reed_debounce = 0;
 
 Servo servo;
 
@@ -184,7 +185,9 @@ void setup()
 
   attachInterrupt(REED_SWITCH_PIN, ISR_REED, RISING);
 
-  servo.write(motor_position);
+  servo.write(MOTOR_POS(MOTOR_DEFAULT_POSITION));
+  // Wait for servo to get position
+  vTaskDelay(MOTOR_INIT_DELAY);
 #ifdef DEBUG
   sprintf(str, "Setup completed Core ID: %d   %u\n", xPortGetCoreID(), millis());
   Serial.print(str);
@@ -210,30 +213,33 @@ void loop()
     if (motor_position > MOTOR_MAX_POSITION)
       motor_position = MOTOR_MAX_POSITION;
 
-    switch_debounce = millis();
-    switch_flag = 0;
 #ifdef DEBUG
-    sprintf(str, "New position: %d\n", motor_position);
+    sprintf(str, "RP:%d RM:%d LP:%d LM:%d Pos: %d\n",
+            digitalRead(R_PLUS_PIN),
+            digitalRead(R_MINUS_PIN),
+            digitalRead(L_PLUS_PIN),
+            digitalRead(L_MINUS_PIN),
+            motor_position);
     Serial.print(str);
 #endif
-    servo.write(motor_position);
+
+    servo.write(MOTOR_POS(motor_position));
+
+    switch_debounce = millis();
+    switch_flag = 0;
   }
 
   if (reed_flag)
   {
-#ifdef DEBUG
-    static uint16_t cnt = 0;
-    sprintf(str, "Reed! Device connected: %s , Timestamp: %u CNT: %d\n", deviceConnected ? "Yes" : "No", reed_debounce, ++cnt);
-    Serial.print(str);
-#endif
-    if (deviceConnected && (millis() - reed_debounce) >= REED_DEBOUNCE_TIME)
+    uint16_t cur = (uint16_t)millis();
+    uint16_t time = (cur - reed_debounce);
+    float cadence = 60000.f / (float)time;
+
+    if (deviceConnected && (time >= REED_DEBOUNCE_TIME))
     {
-      static uint16_t time = (millis() - reed_debounce);
-      float cadence = 60000.f / (float)time;
+      power = Aconst * (float)(motor_position + Bconst) * cadence;
 
-      power = Aconst * (float)motor_position * cadence + Bconst;
-
-      timestamp += (uint16_t)time;
+      timestamp += time;
       revolutions += 1;
 
       bleBuffer[0] = flags & 0xff;
@@ -253,8 +259,14 @@ void loop()
       c_SERVICE_CYCLING_POWER_FEATURE->setValue((uint8_t *)fBuffer, 4);
       c_SERVICE_CYCLING_POWER_MEASUREMENT->setValue((uint8_t *)bleBuffer, 8);
       c_SERVICE_CYCLING_POWER_MEASUREMENT->notify();
+      reed_debounce = cur;
+
+#ifdef DEBUG
+      static uint16_t cnt = 0;
+      sprintf(str, "Time: %d Cadence: %d Timestamp: %u PWR: %d, CNT: %d\n", time, (int)cadence, cur, (int)power, ++cnt);
+      Serial.print(str);
+#endif
     }
-    reed_debounce = millis();
     reed_flag = 0;
   }
 
